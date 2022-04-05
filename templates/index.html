@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+
+<head>	
+	<link rel="stylesheet" href="https://codepen.io/chriddyp/pen/bWLwgP.css">
+	<title> Risk Tolerance Prediction (ML API)
+    </title>
+    <style>
+    	table.center {
+  			margin-left: auto; 
+  			margin-right: auto;
+  			width: 70%;              
+		}
+		td {
+  			align: center;
+  			vertical-align: center;
+		}
+        body{
+        	color: white;
+            font-size: 16px;
+        }
+        input.button{
+        	color: white;
+            font-size: 16px;
+        }
+	</style>
+</head>
+<body bgcolor='#34568B'>
+	<div class='inputs'>
+		<center><h1> <font color='white'>Risk Tolerance Prediction </font> </h1>
+         <u>Please fill in your details below and click Submit: </u></center>
+
+		<form action="{{url_for('predict')}}" method="post">
+        	<table class='center' border=0.5>
+            <tr>
+            	<td><b> Features </b> </td>
+                <td><b> Inputs </b> </td>
+            </tr>
+            <strong>
+    		<tr>
+            	<td> Sex: (1-male; 0-female)</td>
+                <td>
+                	<input type="range" name='sex_male' required='required' min="0" max="1"  value="1" id="sex_slider"/>
+                	<span id='sex_value'> </span></td>
+            </tr>             
+            <script>
+            	sex_slider = document.getElementById("sex_slider")
+                sex_slider.oninput = function(){
+                	document.getElementById("sex_value").innerHTML = this.value
+                }
+            </script>            
+    		<tr>
+            	<td> Age (18-100): </td>
+                <td>
+                	<input type="range" name='AGE' required='required' min="18" max="100"  value="61" id="age_slider"/>
+                	<span id='age_value'> </span></td>
+            </tr> 
+            <script>
+            	age_slider = document.getElementById("age_slider")
+                age_slider.oninput = function(){
+                	document.getElementById("age_value").innerHTML = this.value
+                }
+            </script>
+            <tr>
+            	<td> Education (1-No schooling; 2-High school; 3-College; 4-Grad or higher):</td>
+                <td>
+                	<input type="range" name='EDCL' required='required' min="1" max="4"  value="4" id="edcl_slider"/>
+                	<span id='edcl_value'> </span></td>
+            </tr> 
+            <script>
+            	edcl_slider = document.getElementById("edcl_slider")
+                edcl_slider.oninput = function(){
+                	document.getElementById("edcl_value").innerHTML = this.value
+                }
+            </script>
+            
+            <tr>
+            	<td> Occupation (1-Managerial; 2-Technical; 3-Laborer/Farmer; 4-Not working):</td>
+                <td>
+                	<input type="range" required='required' min="1" max="4"  value="1" id="occup_slider"/>
+                    <input type="hidden" name = 'Occu_MngProf' id='Occu_MngProf' value='1'> </span>
+                    <input type="hidden" name = 'Occu_TechSalServ' id='Occu_TechSalServ' value='0'> </span>
+                    <input type="hidden" name = 'Occu_Other' id='Occu_Other' value='0'> </span>
+                	<span id='occup_value'> </span>
+                </td>
+            </tr> 
+            <script>
+            	occup_slider = document.getElementById("occup_slider")
+                occup_slider.oninput = function(){
+                	                    document.getElementById("occup_value").innerHTML = this.value
+                	
+                    if(this.value == 1){
+                    	document.getElementById("Occu_MngProf").value = 1
+                        document.getElementById("Occu_TechSalServ").value = 0
+                        document.getElementById("Occu_Other").value = 0
+                    } else if(this.value == 2){
+                    	document.getElementById("Occu_MngProf").value = 0
+                        document.getElementById("Occu_TechSalServ").value = 1
+                        document.getElementById("Occu_Other").value = 0
+                    } else if(this.value == 3){
+                    	document.getElementById("Occu_MngProf").value = 0
+                        document.getElementById("Occu_TechSalServ").value = 0
+                        document.getElementById("Occu_Other").value = 1
+                    } else{
+                    	document.getElementById("Occu_MngProf").value = 0
+                        document.getElementById("Occu_TechSalServ").value = 0
+                        document.getElementById("Occu_Other").value = 0
+                    }                     
+                }
+            </script>
+            <tr>
+            	<td> Marital Status (1-Married/Live-in; 0-Otherwise):</td>
+                <td>
+                	<input type="range" name='IsMarried' required='required' min="0" max="1"  value="1" id="married_slider"/>
+                	<span id='married_value'> </span></td>
+            </tr> 
+            <script>
+            	married_slider = document.getElementById("married_slider")
+                married_slider.oninput = function(){
+                	document.getElementById("married_value").innerHTML = this.value
+                }
+            </script>
+            <tr>
+            	<td> No. of Kids (0 - 10): </td>
+                <td>
+                	<input type="range" name='KIDS' required='required' min="0" max="10"  value="1" id="kids_slider"/>
+                	<span id='kids_value'> </span></td>
+            </tr> 
+            <script>
+            	kids_slider = document.getElementById("kids_slider")
+                kids_slider.oninput = function(){
+                	document.getElementById("kids_value").innerHTML = this.value
+                }
+            </script>
+			<tr>
+            	<td> Annual Income ($): </td>
+                <td>
+                	<input type="range"  required='required' min="0" max="1000000"  value="374565" id="income_slider"/>                    
+                    <input type='hidden' name='INCOME' value="12.8335" id='income_value'/></td>
+            </tr>
+            <script>
+            	income_slider = document.getElementById("income_slider")
+                income_slider.oninput = function(){                	
+                	document.getElementById("income_value").value = Math.log(parseInt(this.value)+1)
+                }
+            </script>
+            <tr>
+            	<td> Networth Category (-$10M to +$100M on a scale of 0 to 10): </td>
+                <td>
+                	<input type="range" name='Networth_bin' required='required' min="0" max="10"  value="9" id="networth_bin_slider"/>
+                	<span id='networth_bin_value'> </span><br>
+            </tr>
+            <script>
+            	networth_bin_slider = document.getElementById("networth_bin_slider")
+                networth_bin_slider.oninput = function(){
+document.getElementById("networth_bin_value").innerHTML = this.value
+                }
+            </script>
+            <tr>
+            	<td> Have any pension plan? (1-yes, 0-no): </td>
+                <td>
+                	<input type="range" name='ANYPEN' required='required' min="0" max="1"  value="1" id="anypen_slider"/>
+                	<span id='anypen_value'> </span><br>
+            </tr>
+            <script>
+            	anypen_slider = document.getElementById("anypen_slider")
+                anypen_slider.oninput = function(){
+document.getElementById("anypen_value").innerHTML = this.value
+                }
+            </script>
+            <tr>
+            	<td> How were your last year expenses? (1: unusually high; 2: normal, 3: unusually high) </td>
+                <td>
+                	<input type="range" name='EXPENSHILO' required='required' min="1" max="3"  value="2" id="expense_slider"/>
+                	<span id='expense_value'> </span><br>
+            </tr>
+            <script>
+            	expense_slider = document.getElementById("expense_slider")
+                expense_slider.oninput = function(){
+document.getElementById("expense_value").innerHTML = this.value
+                }
+            </script>
+            <tr>
+            	<td> Did you face any bankruptcy in last 5 years? (1-yes; 0-no)  </td>
+                <td>
+                	<input type="range" name='BNKRUPLAST5' required='required' min="0" max="1"  value="0" id="bankrupt_slider"/>
+                	<span id='bankrupt_value'> </span><br>
+            </tr>
+            <script>
+            	bankrupt_slider = document.getElementById("bankrupt_slider")
+                bankrupt_slider.oninput = function(){
+document.getElementById("bankrupt_value").innerHTML = this.value
+                }
+            </script>
+            <tr>
+            	<td> Did you face any foreclosure in last 5 years? (1-yes; 0-no)  </td>
+                <td>
+                	<input type="range" name='FORECLLAST5' required='required' min="0" max="1"  value="0" id="forecl_slider"/>
+                	<span id='forecl_value'> </span><br>
+            </tr>
+            <script>
+            	forecl_slider = document.getElementById("forecl_slider")
+                forecl_slider.oninput = function(){
+document.getElementById("forecl_value").innerHTML = this.value
+                }
+            </script>
+            <tr>
+            	<td> Will you spend more, if your asset value appreciates? (1=agree strongly, 2=agree somewhat, 3=neither agree nor disagree, 4=disagree somewhat, 5=disagree strongly)  </td>
+                <td>
+                	<input type="range" name='SPENDMOR' required='required' min="1" max="5"  value="5" id="spendmor_slider"/>
+                	<span id='spendmor_value'> </span><br>
+            </tr>
+            <script>
+            	spendmor_slider = document.getElementById("spendmor_slider")
+                spendmor_slider.oninput = function(){
+document.getElementById("spendmor_value").innerHTML = this.value
+                }
+            </script>
+            <tr>
+            	<td> Will you spend less, if your asset value depreciates? (1=agree strongly, 2=agree somewhat, 3=neither agree nor disagree, 4=disagree somewhat, 5=disagree strongly)  </td>
+                <td>
+                	<input type="range" name='SPENDLESS' required='required' min="1" max="5"  value="4" id="spendless_slider"/>
+                	<span id='spendless_value'> </span><br>
+            </tr>
+            <script>
+            	spendless_slider = document.getElementById("spendless_slider")
+                spendless_slider.oninput = function(){
+document.getElementById("spendless_value").innerHTML = this.value
+                }
+            </script>
+            <tr>
+            	<td> How do you rate your knowledge on investments? (on a scale of 1-10)  </td>
+                <td>
+                	<input type="range" name='KNOWL' required='required' min="0" max="10"  value="9" id="knowl_slider"/>
+                	<span id='knowl_value'> </span><br>
+            </tr>
+            <script>
+            	knowl_slider = document.getElementById("knowl_slider")
+                knowl_slider.oninput = function(){
+document.getElementById("knowl_value").innerHTML = this.value
+                }
+            </script>
+            <tr>
+            	<td> How willing are you to take financial risk? (1 - substantial risk; 2 - average amount of risk; 3 - no risk at all) </td>
+                <td>
+                	<input type="range" name='FINRISK' required='required' min="1" max="3"  value="2" id="finrisk_slider"/>
+                	<span id='finrisk_value'> </span><br>
+            </tr>
+            </strong>
+            <script>
+            	finrisk_slider = document.getElementById("finrisk_slider")
+                finrisk_slider.oninput = function(){
+document.getElementById("finrisk_value").innerHTML = this.value
+                }
+            </script>
+        </table>  
+		     <center><input type='submit' class='button'/> </center>
+		   
+    	</form>
+            
+        <br>
+        <Br>
+        <center><b><h2>*** {{ prediction_text }} ***<h2></b></center>
+    </div>
+    <br><br><br>
+    <center>&#169;Copyright M B Sreevathsa 2022</center>
+</body>
+</html>
