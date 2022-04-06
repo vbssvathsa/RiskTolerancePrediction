@@ -135,13 +135,15 @@
 			<tr>
             	<td> Annual Income ($): </td>
                 <td>
-                	<input type="range"  required='required' min="0" max="1000000"  value="374565" id="income_slider"/>                    
+                	<input type="range"  required='required' min="0" max="1000000"  value="374565" id="income_slider"/>  
+                    <span id='income_display_value'>374565</span>
                     <input type='hidden' name='INCOME' value="12.8335" id='income_value'/></td>
             </tr>
             <script>
             	income_slider = document.getElementById("income_slider")
                 income_slider.oninput = function(){                	
-                	document.getElementById("income_value").value = Math.log(parseInt(this.value)+1)
+                	document.getElementById("income_display_value").innerHTML = this.value
+                    document.getElementById("income_value").value = Math.log(parseInt(this.value)+1)
                 }
             </script>
             <tr>
